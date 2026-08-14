@@ -3,6 +3,7 @@ local B, C, L, DB = unpack(ns)
 local module = B:RegisterModule("Cooldown")
 
 local DISABLE_INDEX = 5
+local DISABLE_GLOBAL_HOOKS_FOR_CRASH_TEST = true
 local numberFormatter = C_StringUtil.CreateNumericRuleFormatter()
 local hookedCooldownFrames = {}
 
@@ -79,6 +80,10 @@ function module:UpdateCooldownFormat()
 end
 
 function module:OnLogin()
+	-- Temporary diagnostic: skip global Cooldown method hooks to isolate
+	-- SECURITY-CODE<342> crashes triggered by SetCooldownFromDurationObject.
+	if DISABLE_GLOBAL_HOOKS_FOR_CRASH_TEST then return end
+
 	module:UpdateBreakPoints()
 
 	local cooldown_mt = getmetatable(ActionButton1Cooldown).__index
